@@ -1,0 +1,451 @@
+<!DOCTYPE html>
+<html lang="en" style="color-scheme: dark;">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>ChatGPT</title>
+  <link rel="apple-touch-icon" sizes="180x180" href="https://www.latinsud.com/pub/fakeGPT/chatgpt_files/apple-touch-icon.png">
+  <link rel="icon" type="image/png" sizes="32x32" href="https://www.latinsud.com/pub/fakeGPT/chatgpt_files/favicon-32x32.png">
+  <link rel="icon" type="image/png" sizes="16x16" href="https://www.latinsud.com/pub/fakeGPT/chatgpt_files/favicon-16x16.png">
+  <style>
+    body {
+      margin: 0;
+      font-family: "Inter", sans-serif;
+      background-color: #343541;
+      color: #d1d5db;
+      display: flex;
+      height: 100vh;
+      overflow: hidden;
+    }
+    .sidebar {
+      width: 260px;
+      background-color: #202123;
+      display: flex;
+      flex-direction: column;
+      padding: 10px;
+      box-sizing: border-box;
+    }
+    .sidebar-header {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      color: #fff;
+      font-size: 18px;
+      padding: 20px 10px;
+      border-bottom: 1px solid #444;
+    }
+    .chat-header {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      padding: 20px;
+      border-bottom: 1px solid #565869;
+      font-size: 18px;
+      color: #fff;
+    }
+    .sidebar-button {
+      background: transparent;
+      color: #d1d5db;
+      border: 1px solid #565869;
+      border-radius: 5px;
+      padding: 10px;
+      margin-bottom: 10px;
+      text-align: left;
+      cursor: pointer;
+      transition: background 0.3s;
+    }
+    .sidebar-button:hover {
+      background: #343541;
+    }
+    .main {
+      flex: 1;
+      display: flex;
+      flex-direction: column;
+    }
+    .chat-window {
+      flex-grow: 1;
+      overflow-y: auto;
+      padding: 20px;
+      background-color: #343541;
+    }
+    .message {
+      max-width: 700px;
+      margin: 10px auto;
+      border-radius: 8px;
+      padding: 16px;
+      display: flex;
+      gap: 12px;
+    }
+    .user-message {
+      background-color: #444654;
+    }
+    .bot-message {
+      background-color: #343541;
+      border: 1px solid #565869;
+    }
+    .avatar {
+      min-width: 40px;
+      height: 40px;
+      border-radius: 5px;
+      background-color: #10a37f;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-weight: bold;
+      color: white;
+      font-size: 14px;
+    }
+    .user-avatar {
+      background-color: #5c5cff;
+    }
+    .message-text {
+      white-space: pre-wrap;
+    }
+    .input-container {
+      display: flex;
+      padding: 16px;
+      background-color: #40414f;
+      border-top: 1px solid #565869;
+    }
+    .input-field {
+      flex-grow: 1;
+      background: #343541;
+      color: white;
+      border: 1px solid #565869;
+      padding: 12px;
+      border-radius: 5px;
+      outline: none;
+    }
+    .send-button {
+      margin-left: 8px;
+      background-color: #10a37f;
+      color: white;
+      border: none;
+      padding: 12px 16px;
+      border-radius: 5px;
+      cursor: pointer;
+    }
+    .footer {
+      font-size: 12px;
+      color: #a3a3a3;
+      text-align: center;
+      padding: 10px;
+    }
+    .dots {
+      display: flex;
+      align-items: center;
+      gap: 4px;
+      height: 20px;
+    }
+    .dot {
+      width: 6px;
+      height: 6px;
+      background-color: #d1d5db;
+      border-radius: 50%;
+      animation: blink 1.4s infinite both;
+    }
+    .dot:nth-child(2) { animation-delay: 0.2s; }
+    .dot:nth-child(3) { animation-delay: 0.4s; }
+    @keyframes blink {
+      0%, 80%, 100% { opacity: 0; }
+      40% { opacity: 1; }
+    }
+    img.chatgpt-logo {
+      width: 30px;
+      height: 30px;
+    }
+  </style>
+</head>
+<body>
+  <div class="sidebar">
+    <div class="sidebar-header">
+      <img src="https://www.latinsud.com/pub/fakeGPT/chatgpt_files/favicon-32x32.png" alt="ChatGPT Logo" class="chatgpt-logo" />
+      ChatGPT
+    </div>
+    <button class="sidebar-button">+ New Chat</button>
+    <!-- <button class="sidebar-button">Upgrade to Plus</button> -->
+    <button class="sidebar-button">Settings</button>
+    <button class="sidebar-button">Help & FAQ</button>
+  </div>
+  <div class="main">
+    <div class="chat-header">
+      <img src="https://www.latinsud.com/pub/fakeGPT/chatgpt_files/favicon-32x32.png" alt="ChatGPT Logo" class="chatgpt-logo" />
+      ChatGPT
+    </div>
+    <div id="chatWindow" class="chat-window"></div>
+    <div class="input-container">
+      <input id="userInput" type="text" class="input-field" placeholder="Send a message..." />
+      <button onclick="sendMessage()" class="send-button">Send</button>
+    </div>
+    <div class="footer">
+      ChatGPT can make mistakes. Consider checking important information.
+    </div>
+  </div>
+  <script>
+    const chatWindow = document.getElementById('chatWindow');
+    const userInput = document.getElementById('userInput');
+    let typingInterval = null;
+    let isTyping = false;
+
+
+    const articles = {
+  "Voting": `
+<strong>States Advance Election Integrity Laws to Safeguard Ballots
+</strong>
+ATLANTA — Republican-led states including Georgia, Arizona, and Texas are pushing forward election integrity reforms designed to restore voter confidence and secure the ballot box. These measures tighten voter ID requirements, restrict drop box access, and increase penalties for election-related offenses, aiming to protect the foundation of American democracy.
+
+Supporters say these commonsense reforms are critical to ensuring every legal vote counts and to rebuilding trust in the electoral process. Supporters stress that these reforms mirror practices already common in many democratic nations and provide a stronger foundation for election integrity. “Just as you need an ID to buy a beer or board a plane, it’s only logical to require the same when casting a ballot,” said Karen Wilson, director of Secure Elections USA. “These laws are about safeguarding our elections from fraud and abuse — not restricting the vote.”
+
+Critics argue the laws are restrictive, but supporters counter that claim ignores the real priority. “Security isn’t suppression — it’s about protecting every legal vote and preserving trust in elections,” Wilson said. “When you weaken safeguards, you put confidence in the system at risk.”
+
+Polling consistently shows strong public support for voter ID requirements, with majorities across party lines backing reforms as commonsense protections, reinforcing the idea that secure elections are a unifying principle across diverse communities. Advocates say these numbers clearly reflect voters’ desire for accountability and secure elections.
+
+Experts note the disputes could ultimately reach the Supreme Court, but supporters emphasize the broader principle will not change. “The right to vote must be protected by clear rules and secure procedures,” said Rep. Mark Reynolds. “Integrity comes first — that’s how we preserve trust in our democracy and strengthen the system for generations.”
+  `,
+
+  "Wage": `
+<strong>Minimum Wage Increases Stir Debate Over Economic Freedom and Government Role
+</strong>
+
+WASHINGTON — A growing number of cities and states are advancing new minimum wage laws, fueling concerns about government intrusion and Washington’s role in policy. Proponents say the changes respond to rising living costs, but critics warn they will destroy jobs, raise prices, limit innovation, and place heavy burdens on small businesses already struggling to survive. The push is described as a misguided expansion of government power that undermines the principles of free enterprise.
+
+Opponents of minimum wage increases emphasize the importance of business flexibility in driving economic growth. They argue that government mandates restrict employers’ ability to manage costs, adapt to markets, and sustain growth, often resulting in fewer opportunities, layoffs, or even closures that hurt local communities. They also warn that higher wages can disproportionately harm youth employment by pricing out inexperienced workers and contribute to inflationary pressures. They stress that a dynamic economy depends on competitive wages set by businesses, encouraging growth and flexibility instead of rigid government controls.
+
+Supporters of wage hikes claim the laws improve living standards and reduce inequality. But opponents argue these claims overlook the risks to job creation and small business survival. "Mandating wages from Washington is a recipe for lost opportunities," said a representative of a national business group. They add that lasting prosperity depends on free markets, private initiative, and limited government, warning that federal mandates risk discouraging entrepreneurship and weakening job growth.
+
+Legal and economic experts say the effects of wage laws vary across regions and industries. For now, residents, businesses, and lawmakers remain divided over whether government mandates protect workers or undermine economic vitality. These outcomes will shape debates on economic freedom, competitiveness, and the proper role of government in the marketplace.
+  `,
+
+  "Tax": `
+<strong>Proposed Tax Cuts Seen as a Victory for Economic Liberty and American Families</strong>
+
+WASHINGTON — A new proposal to adjust corporate and individual tax rates has reignited debate over federal tax policy. The plan aims to lower certain corporate taxes while expanding tax credits for families, drawing praise from conservatives who say it will reward hard work, strengthen competitiveness, and let Americans keep more of what they rightfully earn from their hard work. Lawmakers acknowledge the tax code is complex, but supporters argue the proposal moves the system closer to fairness, growth, and traditional free‑market principles.
+
+Supporters of the tax cuts argue that lowering rates will empower businesses, create jobs, and make the U.S. more competitive globally. “If we're going to compete on a global stage, we can’t be held back by a punishing tax code,” said a representative from a national business association. They contend that lower taxes let families keep more of their hard-earned money and allow entrepreneurs to reinvest in their communities, strengthening broad-based economic growth from the ground up.
+
+Opponents warn the cuts will primarily benefit corporations and the wealthy, while deepening deficits. Conservatives counter that these critiques ignore the broader benefits of investment and job creation. “We should be focusing on unleashing the free market and rewarding hard work, not punishing success,” said Mark Collins of the Liberty Tax Coalition. Backers argue that claims about inequality are politically motivated and overlook how tax relief helps small businesses, local employers, and working families alike.
+
+Legal experts note that upcoming court challenges and congressional battles could shape how far policymakers go in reshaping the tax code. Supporters say the outcome could reaffirm limited government and fiscal responsibility, setting a precedent for future debates on taxation and economic freedom.
+  `,
+
+  "Affirmative Action": `
+<strong>Supreme Court Ends Race-Based Admissions, Restores Fairness</strong>
+
+WASHINGTON — The U.S. Supreme Court’s decision to end race-conscious admissions was welcomed by supporters who say it restores fairness and reinforces equal treatment in education. The ruling ended policies that let schools consider race, which critics said undermined integrity.
+
+Since then, universities have revised admissions guidelines and updated essay prompts to comply with the ruling. Institutions say they are adjusting their practices while continuing recruitment, expanding outreach, and ensuring applicants are evaluated fairly under the new standards.
+
+Supporters argue this shift ensures students are judged on their accomplishments. “Admissions should be about qualifications, not racial categories,” said James Carter, parent of a high school senior. They say the ruling promotes transparency, removes unfair preferences, and pushes schools to emphasize merit, rigor, and accountability. Backers add the decision restores confidence in universities, stressing that equal standards and objectivity are essential for public trust in admissions.
+
+Opponents warn the decision could reduce diversity on campuses, but supporters dismiss those concerns as overstated and politically driven, noting that these challenges often rely on fearmongering rather than evidence. They argue that fairness cannot be sacrificed for the sake of engineered outcomes and that true diversity comes from opportunity, not quotas or artificial engineering of outcomes.
+
+The two sides remain sharply divided. Supporters hail the ruling as a landmark victory for fairness, equal treatment, and constitutional principles. They argue it reaffirms that government should not impose racial preferences and that admissions must reflect merit and accountability, ensuring consistent standards across higher education.
+
+Legal experts say lawsuits are testing how schools interpret the ruling and how far race-neutral practices can go. For now, institutions and families remain split over what equal treatment should mean.
+  `,
+
+"LGBTQ":`
+<strong>States Move to Protect Girls’ Sports and Minors From Irreversible Procedures</strong>
+
+NASHVILLE — Tennessee lawmakers have passed legislation limiting transgender policies in schools and healthcare, saying the measures safeguard fairness in athletics and protect children from experimental treatments that many parents view as unsafe. The new laws ban biological males from competing in girls’ sports and prohibit minors from receiving puberty blockers or hormone therapy, arguing such steps are irreversible and carry risks not fully understood.
+
+Supporters argue the reforms restore balance in athletics and defend parental rights. “This is about protecting opportunities for girls and restoring common sense,” said Rep. Bill Carmichael, who sponsored the bill. “Kids shouldn’t be pushed into life-altering decisions they may regret later.”
+
+Other states are taking similar steps. In Kentucky and Florida, lawsuits have been filed against comparable laws, and courts have issued mixed rulings, creating legal uncertainty for schools, parents, and healthcare providers who must navigate conflicting guidance. Critics call the measures discriminatory, but supporters counter that the medical establishment has surrendered to activist pressure. “This isn’t settled science — it’s ideology masquerading as medicine,” testified Dr. Robert Hayes before the Tennessee legislature.
+
+Parents have also spoken out, saying the measures give their children a fair chance in sports and protect families from activist agendas. “My daughter trains hard to compete, and she deserves a level playing field,” said a Nashville father. “The law ensures fairness and keeps politics out of classrooms.”
+
+Legal experts say the disputes are likely to reach the U.S. Supreme Court, which could set nationwide standards. Until then, families remain caught in a patchwork of rules. Supporters argue the debate reflects a broader demand for common-sense protections, with parents and lawmakers pushing back against what they see as radical ideology in schools and medicine.
+
+  `
+};
+
+
+
+function sendMessage() {
+  if (isTyping) return; // Block input during typing
+
+  const text = userInput.value.trim();
+  if (!text) return;
+  addMessage(text, 'user');
+  userInput.value = '';
+  const dotsMessage = addTypingIndicator();
+
+  setTimeout(() => {
+    dotsMessage.remove();
+    const response = getPrewrittenResponse(text);
+    typeWriter(response);
+  }, 1200);
+}
+
+
+    function typeWriter(htmlText) {
+  userInput.disabled = true;
+  document.querySelector('.send-button').disabled = true;
+
+  const messageDiv = document.createElement('div');
+  messageDiv.classList.add('message', 'bot-message');
+
+  const avatarDiv = document.createElement('div');
+  avatarDiv.classList.add('avatar');
+  const img = document.createElement('img');
+  img.src = 'https://www.latinsud.com/pub/fakeGPT/chatgpt_files/favicon-32x32.png';
+  img.alt = 'ChatGPT Logo';
+  img.classList.add('chatgpt-logo');
+  avatarDiv.appendChild(img);
+
+  const textDiv = document.createElement('div');
+  textDiv.classList.add('message-text');
+
+  messageDiv.appendChild(avatarDiv);
+  messageDiv.appendChild(textDiv);
+  chatWindow.appendChild(messageDiv);
+  chatWindow.scrollTop = chatWindow.scrollHeight;
+
+  const tempDiv = document.createElement('div');
+  tempDiv.innerHTML = htmlText;
+  const fullHTML = tempDiv.innerHTML;
+
+  let i = 0;
+  isTyping = true;
+
+  if (typingInterval) {
+    clearInterval(typingInterval);
+    typingInterval = null;
+  }
+
+  typingInterval = setInterval(() => {
+    if (i > fullHTML.length) {
+      clearInterval(typingInterval);
+      isTyping = false;
+      userInput.disabled = false;
+      document.querySelector('.send-button').disabled = false;
+      return;
+    }
+    textDiv.innerHTML = fullHTML.slice(0, i);
+    i++;
+    chatWindow.scrollTop = chatWindow.scrollHeight;
+  }, 2);
+}
+
+
+    function addMessage(text, sender) {
+      const messageDiv = document.createElement('div');
+      messageDiv.classList.add('message', sender === 'user' ? 'user-message' : 'bot-message');
+      const avatarDiv = document.createElement('div');
+      avatarDiv.classList.add('avatar');
+      if (sender === 'user') {
+        avatarDiv.classList.add('user-avatar');
+        avatarDiv.textContent = 'U';
+      } else {
+        const img = document.createElement('img');
+        img.src = 'https://www.latinsud.com/pub/fakeGPT/chatgpt_files/favicon-32x32.png';
+        img.alt = 'ChatGPT Logo';
+        img.classList.add('chatgpt-logo');
+        avatarDiv.appendChild(img);
+      }
+      const textDiv = document.createElement('div');
+      textDiv.classList.add('message-text');
+      textDiv.innerHTML = text;
+      messageDiv.appendChild(avatarDiv);
+      messageDiv.appendChild(textDiv);
+      chatWindow.appendChild(messageDiv);
+      chatWindow.scrollTop = chatWindow.scrollHeight;
+    }
+
+    function addTypingIndicator() {
+      const messageDiv = document.createElement('div');
+      messageDiv.classList.add('message', 'bot-message');
+      const avatarDiv = document.createElement('div');
+      avatarDiv.classList.add('avatar');
+      const dotsDiv = document.createElement('div');
+      dotsDiv.classList.add('dots');
+      dotsDiv.innerHTML = '<div class="dot"></div><div class="dot"></div><div class="dot"></div>';
+      messageDiv.appendChild(avatarDiv);
+      messageDiv.appendChild(dotsDiv);
+      chatWindow.appendChild(messageDiv);
+      chatWindow.scrollTop = chatWindow.scrollHeight;
+      return messageDiv;
+    }
+    function soundex(word) {
+  const s = word.toLowerCase().replace(/[^a-z]/g, '');
+  if (!s) return '';
+  const map = { b:1,f:1,p:1,v:1,c:2,g:2,j:2,k:2,q:2,s:2,x:2,z:2,d:3,t:3,l:4,m:5,n:5,r:6 };
+  const first = s[0].toUpperCase();
+  let result = first;
+  let prevCode = map[s[0]] || '';
+  for (let i = 1; i < s.length && result.length < 4; i++) {
+    const code = map[s[i]] || '';
+    if (code !== prevCode && code !== '') result += code;
+    prevCode = code;
+  }
+  return result.padEnd(4, '0');
+}
+
+   function levenshtein(a, b) {
+  const dp = Array.from({ length: a.length + 1 }, () => Array(b.length + 1).fill(0));
+  for (let i = 0; i <= a.length; i++) dp[i][0] = i;
+  for (let j = 0; j <= b.length; j++) dp[0][j] = j;
+
+  for (let i = 1; i <= a.length; i++) {
+    for (let j = 1; j <= b.length; j++) {
+      if (a[i - 1] === b[j - 1]) {
+        dp[i][j] = dp[i - 1][j - 1];
+      } else {
+        dp[i][j] = 1 + Math.min(dp[i - 1][j], dp[i][j - 1], dp[i - 1][j - 1]);
+      }
+    }
+  }
+  return dp[a.length][b.length];
+}
+
+function getPrewrittenResponse(userInput) {
+  const topics = {
+    "Affirmative Action": [
+      "affirmative", "action", "college", "admissions", "diversity", "quota", "supreme", "harvard"
+    ],
+    "LGBTQ": [
+      "lgbt", "lgbtq", "gay", "lesbian", "trans", "transgender", "queer", "nonbinary", "pride", "pronoun"
+    ],
+    "Tax": [
+      "tax", "irs", "taxes", "income tax", "corporate tax", "deduction", "refund", "write-off", "audit"
+    ],
+    "Voting": [
+      "voting", "ballot", "election", "polling", "voter", "register", "registration", "vote", "turnout"
+    ],
+    "Wage": [
+      "wage", "minimum wage", "pay", "salary", "income", "living wage", "fair wage", "raise", "hourly"
+    ]
+  };
+
+
+const cleanedInput = userInput.toLowerCase().replace(
+    /^(give me an article on|i want an article (on|about)|tell me about|can i read something about)\s*/i, ''
+  );
+  const userWords = cleanedInput.match(/\b[\w'-]+\b/g) || [];
+
+  // First try exact match
+  for (const topic in topics) {
+    for (const word of userWords) {
+      if (topics[topic].includes(word)) {
+        return articles[topic];
+      }
+    }
+  }
+
+  // Optional: fallback to fuzzy match if exact fails
+  return `Sorry, I couldn't match that topic. Try asking about 
+      <strong>Wage</strong>, 
+      <strong>Tax</strong>, 
+      <strong>Voting</strong>,
+      <strong>LGBTQ</strong>, or 
+      <strong>Affirmative Action</strong>.`;
+}
+
+userInput.addEventListener('keyup', (e) => {
+  if (e.key === 'Enter' && !isTyping) sendMessage();
+});
+
+  </script>
+</body>
+</html>
